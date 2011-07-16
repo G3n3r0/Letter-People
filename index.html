@@ -1,0 +1,260 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<style>
+html {
+	width:100%;
+	height:100%;
+	margin:0px;
+	border:0px;
+	padding:0px;
+}
+body {
+	text-align: center;
+	margin:0px;
+	border:0px;
+	padding:0px;
+	width: 100%;
+	height: 100%;
+	/*background: #959595; /* Old browsers */
+	background-color: black;
+	background-image: -moz-linear-gradient(top, #959595 0%, #0d0d0d 46%, #010101 50%, #0a0a0a 53%, #4e4e4e 76%, #383838 87%, #1b1b1b 100%); /* FF3.6+ */
+	background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#959595), color-stop(46%,#0d0d0d), color-stop(50%,#010101), color-stop(53%,#0a0a0a), color-stop(76%,#4e4e4e), color-stop(87%,#383838), color-stop(100%,#1b1b1b)); /* Chrome,Safari4+ */
+	background-image: -webkit-linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* Chrome10+,Safari5.1+ */
+	background-image: -o-linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* Opera11.10+ */
+	background-image: -ms-linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#959595', endColorstr='#1b1b1b',GradientType=0 ); /* IE6-9 */
+	background-image: linear-gradient(top, #959595 0%,#0d0d0d 46%,#010101 50%,#0a0a0a 53%,#4e4e4e 76%,#383838 87%,#1b1b1b 100%); /* W3C */
+	background-repeat: no-repeat;
+	background-size:100% 100%;
+}
+svg {
+	text-align: center;
+	vertical-align: middle;
+	cursor: crosshair;
+	background-image: url(grass.png);
+}
+text, text tspan {
+	font-family: Arial, sans-serif;
+	font-size: 24px;
+	z-index: 30;
+	cursor: pointer;
+	fill: red;
+}
+#isYou, #isYou tspan {
+	fill: white;
+	font-weight: bold;
+	cursor: default;
+}
+.atk, .hea, .atu, .run {
+	cursor: pointer;
+}
+rect.atk:hover, rect.hea:hover, rect.atu:hover, rect.run:hover {
+	fill: #F0F8FF;
+}
+#battleCanvas text, #battleCanvas text tspan {
+	fill: black;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+<script src="raphael.min.js" type="text/javascript"></script>
+<script>
+$(document).ready(function() {
+	var r = Raphael(0, 0, 480, 320);
+	$("svg").attr("id","svg1");
+	$("svg").attr("align", "center")
+	//r.rect(0,0,r.width,r.height).attr({fill: "white"});
+	//var txt = r.print(10, 50, "Magic", r.getFont("Arial"), 30).attr({fill: "#fff"});
+	// following line will paint first letter in red
+	//txt[0].attr({fill: "#f00"});
+	function Letter(char,x,y, isYou) {
+		this.char = char;
+		this.x = x;
+		this.y = y;
+		var txt = r.text(x,y,char).attr({"font-family": "Arial", "font-size": "11px",x:x,y:y});
+		if(isYou) {
+			$(txt.node).attr("id","isYou");
+		}
+		return txt;
+	}
+	window.b = new Letter("@",100,100,false);
+	window.you = new Letter("A", 10, 10, true);
+//	var text = r.text(30,15,"A").attr({"font-family": "Arial", "font-size": "11px", "font-weight": "bold"});  
+//	console.log(text);
+	//var c = r.circle(50, 50, 40).attr({fill:"black"});
+	// 8 m/s. Let's say that 24px=1m.
+	function calculateDistance(elem, mouseX, mouseY) {
+        return Math.floor(Math.sqrt(Math.pow(mouseX - (elem.offset().left+(elem.width()/2)), 2) + Math.pow(mouseY - (elem.offset().top+(elem.height()/2)), 2)));
+    }
+	function upgrade(letter1, letter2) {
+		var let1 = letter1.toLowerCase().charCodeAt(0);
+		var let2 = letter2.toLowerCase().charCodeAt(0)-96;
+		if(let2<=0) {
+			let2 = 1;
+		}
+//		console.log(String.fromCharCode(let1), String.fromCharCode(let2), String.fromCharCode(let1+let2));
+		window.you.attr({"text": String.fromCharCode(let1+let2).toUpperCase()});
+	}
+	function displayHealth() {
+		if(window.pHealth<=0) {
+			window.pHealth=0;
+			$("#pHealth").text(window.pHealth);
+			$("#eHealth").text(window.eHealth);
+			endBattle("You lost!");
+			return true;
+		} else if(window.eHealth<=0) {
+			window.eHealth=0;
+			$("#pHealth").text(window.pHealth);
+			$("#eHealth").text(window.eHealth);
+			upgrade($(window.you.node).text(), window.curEnem);
+			endBattle("You won! Upgrading!");
+			return true;
+		}
+		$("#pHealth").text(window.pHealth);
+		$("#eHealth").text(window.eHealth);
+		return false;
+	}
+	function battle(player, enemy) {
+		//console.log(player,enemy);
+		window.bP = Raphael(0, 0, r.width, r.height);
+		$(bP.canvas).attr("id", "battleCanvas");
+//		bP.rect(0,0,bP.width,bP.height).attr({fill: "blue"});
+		var pChar = player.text();
+		var play = bP.text(bP.width/2,bP.height-36,pChar).attr({"font-family": "Arial", "font-size": "11px",x:bP.width/3,y:bP.height-18});
+		$(play.node).children().css({"font-size":"36px"});
+		
+		var eChar = enemy.text();
+		var enem = bP.text(bP.width/2,36,eChar).attr({"font-family": "Arial", "font-size": "11px",x:bP.width/2,y:25});
+		$(enem.node).children().css({"font-size":"36px"});
+		
+		window.pAtk = (pChar.toLowerCase().charCodeAt(0)-96)*2;
+		window.eAtk = (eChar.toLowerCase().charCodeAt(0)-96)*2;
+		//console.log(window.eAtk)
+		if(window.eAtk<=0) {
+			window.eAtk=1;
+		}
+		//console.log(window.eAtk)
+		window.pHealth = pAtk*10;
+		window.eHealth = eAtk*10;
+		
+		var eh = bP.text(bP.width/2+36, 36, "").attr({"font-family": "Arial", "font-size": "11px",x:bP.width/2+36,y:25});
+		$(eh.node).attr("id","eHealth").children().css({"font-size":"30px"});
+		var ph = bP.text(bP.width/2+36, bP.height-36, "").attr({"font-family": "Arial", "font-size": "11px",x:bP.width/2+36,y:bP.height-18});
+		$(ph.node).attr("id","pHealth").children().css({"font-size":"30px"});
+		displayHealth();
+		
+		var menuBox = bP.rect(10, 40, bP.width-20, bP.height-80, 20).attr({fill:"rgba(0,0,0,0.5)"});
+		var atk = bP.rect(20, 50, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		$(atk.node).attr("class", "atk");
+		var hea = bP.rect(240, 50, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		$(hea.node).attr("class", "hea");
+		var atu = bP.rect(20, 162, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		$(atu.node).attr("class", "atu");
+		var run = bP.rect(240, 162, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		$(run.node).attr("class", "run");
+		
+		var atkT = bP.text(128,110,"Attack").attr({"font-family": "Arial", "font-size": "11px",x:128,y:110});
+		$(atkT.node).attr("class", "atk");
+		var heaT = bP.text(150,110,"Heal").attr({"font-family": "Arial", "font-size": "11px",x:350,y:110});
+		$(heaT.node).attr("class", "hea");
+		var atuT = bP.text(128,110,"Attack++").attr({"font-family": "Arial", "font-size": "11px",x:128,y:220});
+		$(atuT.node).attr("class", "atu");
+		var runT = bP.text(150,110,"Run").attr({"font-family": "Arial", "font-size": "11px",x:350,y:220});
+		$(runT.node).attr("class", "run");
+	}
+	function rearrange() {
+		$("svg:first-child text:not(#isYou)").remove();
+		for(i=0;i<5;i++) {
+			var let = $(window.you.node).text().charCodeAt(0)+i-1;
+			new Letter(String.fromCharCode(let), Math.random()*$("svg").width(), Math.random()*$("svg").height());
+		}
+	}
+	function endBattle(msg) {
+		alert(msg);
+		$("#battleCanvas").remove();
+		rearrange();
+	}
+	function disableForm() {
+	var cover = bP.rect(10, 40, bP.width-20, bP.height-80, 20).attr({fill:"rgba(0,0,0,0.5)"});
+	$(cover.node).attr("id", "battleCover");
+	}
+	function enableForm() {
+		$("#battleCover").remove();
+	}
+	function eAttack() {
+		var opts = ["window.pHealth-=window.eAtk", "window.pHealth-=window.eAtk", "window.eHealth+=window.eAtk*2", "window.eHealth+=window.eAtk*2", "window.eAtk+=2", "window.eAtk+=2", "if(Math.random()>=0.875) { endBattle('The enemy booked it.') }"];
+		var opt = opts[Math.floor(Math.random()*opts.length)];
+		console.log(opt);
+		eval(opt);
+	}
+	$(".atk").live("click", function(e) {
+		window.eHealth-=window.pAtk;
+		disableForm();
+		if(displayHealth()) {
+			return false
+		}
+		eAttack();
+		enableForm();
+		displayHealth();
+	});
+	$(".hea").live("click", function(e) {
+		window.pHealth+=window.pAtk*2;
+		disableForm();
+		if(displayHealth()) {
+			return false
+		}
+		eAttack();
+		enableForm();
+		displayHealth();
+	});
+	$(".atu").live("click", function(e) {
+		window.pAtk+=2;
+		disableForm();
+		if(displayHealth()) {
+			return false
+		}
+		eAttack();
+		enableForm();
+		displayHealth();
+	});
+	$(".run").live("click", function(e) {
+		if(Math.random()>=0.5) {
+			endBattle("You ran away.");
+		} else {
+			alert("Oh noes! You couldn't run!");
+			disableForm();
+			if(displayHealth()) {
+				return false
+			}
+			eAttack();
+			enableForm();
+			displayHealth();
+		}
+	});
+	$("#svg1 text:not(#isYou)").live("click", function(e) {
+		$(this).attr("fill","red");
+		var this2 = this;
+		//console.log(this2);
+		you.animate({
+			x:e.layerX,
+			y:e.layerY
+		},15*calculateDistance($(you.node),e.layerX,e.layerY),'linear', function() {
+			//console.log($(this2).text());
+			window.curEnem = $(this2).text();
+			battle($(you.node),$(this2));
+		});
+	});
+	$("svg").click(function(e) {
+		you.animate({
+			x:e.layerX,
+			y:e.layerY
+		},15*calculateDistance($(you.node),e.layerX,e.layerY),'linear');
+		//console.log(e);
+	});
+});
+</script>
+</head>
+<body>
+</body>
+</html>
