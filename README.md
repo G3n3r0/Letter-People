@@ -1,4 +1,4 @@
- _          _   _              _____                 _      
+ï»¿ _          _   _              _____                 _      
 | |        | | | |            |  __ \               | |     
 | |     ___| |_| |_ ___ _ __  | |__) |__  ___  _ __ | | ___ 
 | |    / _ \ __| __/ _ \ '__| |  ___/ _ \/ _ \| '_ \| |/ _ \
@@ -8,13 +8,13 @@
                                               |_|           
 Letter People
 
-"Letter People" is a little game. It's kind of like Pokémon, except with letters instead of Poké critters! It was developed with all open-source technologies, too! Take that, Steve Jobs!
+"Letter People" is a little game. It's kind of like PokÃ©mon, except with letters instead of PokÃ© critters! It was developed with all open-source technologies, too! Take that, Steve Jobs!
 
 Used:
 SVG
 HTML
 JavaScript
-Raphaël JS
+RaphaÃ«l JS
 jQuery
 
 Tested In:
