@@ -2,6 +2,13 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<link rel="shortcut icon" href="icon.png" />
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<link rel="apple-touch-icon-precomposed" href="icon.png" />
+<link rel="apple-touch-icon" href="icon.png" />
+<link rel="apple-touch-startup-image" href="startup.png" />
 <style>
 html {
 	width:100%;
@@ -61,6 +68,13 @@ rect.atk:hover, rect.hea:hover, rect.atu:hover, rect.run:hover {
 <script src="raphael.min.js" type="text/javascript"></script>
 <script>
 $(document).ready(function() {
+	function reorient(e) {
+		var portrait = (window.orientation % 180 == 0);
+		$("body > svg").css("-webkit-transform", portrait ? "rotate(90deg)" : "");
+	}
+	window.onorientationchange = reorient;
+	window.setTimeout(reorient, 0);
+
 	var r = Raphael(0, 0, 480, 320);
 	$("svg").attr("id","svg1");
 	$("svg").attr("align", "center")
