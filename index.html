@@ -70,7 +70,7 @@ rect.atk:hover, rect.hea:hover, rect.atu:hover, rect.run:hover {
 $(document).ready(function() {
 	function reorient(e) {
 		var portrait = (window.orientation % 180 == 0);
-		$("body > svg").css("-webkit-transform", portrait ? "rotate(90deg)" : "");
+		$("body").css("-webkit-transform", portrait ? "rotate(90deg)" : "");
 	}
 	window.onorientationchange = reorient;
 	window.setTimeout(reorient, 0);
