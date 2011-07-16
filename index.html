@@ -159,22 +159,22 @@ $(document).ready(function() {
 		displayHealth();
 		
 		var menuBox = bP.rect(10, 40, bP.width-20, bP.height-80, 20).attr({fill:"rgba(0,0,0,0.5)"});
-		var atk = bP.rect(20, 50, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		var atk = bP.rect(20, 50, 220, 100, 10).attr({fill:"rgb(255,255,255)"});
 		$(atk.node).attr("class", "atk");
-		var hea = bP.rect(240, 50, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		var hea = bP.rect(240, 50, 220, 100, 10).attr({fill:"rgb(255,255,255)"});
 		$(hea.node).attr("class", "hea");
-		var atu = bP.rect(20, 162, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		var atu = bP.rect(20, 152, 220, 100, 10).attr({fill:"rgb(255,255,255)"});
 		$(atu.node).attr("class", "atu");
-		var run = bP.rect(240, 162, 220, 110, 10).attr({fill:"rgb(255,255,255)"});
+		var run = bP.rect(240, 152, 220, 100, 10).attr({fill:"rgb(255,255,255)"});
 		$(run.node).attr("class", "run");
 		
-		var atkT = bP.text(128,110,"Attack").attr({"font-family": "Arial", "font-size": "11px",x:128,y:110});
+		var atkT = bP.text(128,110,"Attack").attr({"font-family": "Arial", "font-size": "11px",x:128,y:100});
 		$(atkT.node).attr("class", "atk");
-		var heaT = bP.text(150,110,"Heal").attr({"font-family": "Arial", "font-size": "11px",x:350,y:110});
+		var heaT = bP.text(150,110,"Heal").attr({"font-family": "Arial", "font-size": "11px",x:350,y:100});
 		$(heaT.node).attr("class", "hea");
-		var atuT = bP.text(128,110,"Attack++").attr({"font-family": "Arial", "font-size": "11px",x:128,y:220});
+		var atuT = bP.text(128,110,"Attack++").attr({"font-family": "Arial", "font-size": "11px",x:128,y:200});
 		$(atuT.node).attr("class", "atu");
-		var runT = bP.text(150,110,"Run").attr({"font-family": "Arial", "font-size": "11px",x:350,y:220});
+		var runT = bP.text(150,110,"Run").attr({"font-family": "Arial", "font-size": "11px",x:350,y:200});
 		$(runT.node).attr("class", "run");
 	}
 	function rearrange() {
